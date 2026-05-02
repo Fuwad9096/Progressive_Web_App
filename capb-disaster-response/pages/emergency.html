@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Mode - CAPB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <div class="navbar-brand-icon">C</div>
+                <div>CAPB</div>
+            </div>
+            <a href="../index.html" class="navbar-link">Back</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-background">
+            <div class="hero-grid"></div>
+            <div class="hero-glow hero-glow-1" style="top: auto; bottom: -100px;"></div>
+        </div>
+
+        <div style="max-width: 600px; width: 100%; position: relative; z-index: 1;">
+            <div class="card animate-in">
+                <div class="card-header" style="flex-direction: column; text-align: center; margin-bottom: 2rem; border: none;">
+                    <h1 style="color: var(--primary); margin: 0;">EMERGENCY MODE</h1>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem;">No account needed - Get help now</p>
+                </div>
+
+                <form id="emergency-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Your Name (Optional)</label>
+                        <input type="text" placeholder="Enter your name" class="form-input">
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Emergency Severity</label>
+                        <div style="display: grid; gap: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="severity" value="critical" checked style="width: 1.25rem; height: 1.25rem;">
+                                <span style="flex: 1;"><strong>CRITICAL</strong> - Life threatening</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="severity" value="high" style="width: 1.25rem; height: 1.25rem;">
+                                <span style="flex: 1;"><strong>HIGH</strong> - Urgent assistance</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="severity" value="moderate" style="width: 1.25rem; height: 1.25rem;">
+                                <span style="flex: 1;"><strong>MODERATE</strong> - Help needed</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 0.5rem;">
+                        <p style="font-size: 0.875rem; color: #93c5fd; margin: 0;">
+                            <strong>Location automatically captured:</strong><br>
+                            <span id="location-text" style="font-family: monospace;">Detecting location...</span>
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger btn-lg" style="grid-column: 1 / 2; background-color: #dc2626;">Send Alert</button>
+                    <button type="button" class="btn btn-secondary btn-lg" style="grid-column: 2 / 3;" onclick="window.history.back()">Cancel</button>
+                </form>
+
+                <div id="alert-sent" class="hidden" style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; animation: pulse 1s infinite;">🆘</div>
+                    <h3 style="color: var(--primary);">Emergency Alert Sent</h3>
+                    <p style="color: var(--text-muted);">Help is on the way. Redirecting...</p>
+                    <div style="height: 2px; background: linear-gradient(90deg, var(--primary), transparent); margin-top: 1rem; animation: slideRight 3s ease-in-out;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideRight {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+
+    <script src="../js/store.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const {latitude, longitude} = pos.coords;
+                document.getElementById('location-text').textContent = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            });
+        }
+
+        document.getElementById('emergency-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = e.target.querySelector('input[type="text"]').value;
+            const severity = e.target.querySelector('input[name="severity"]:checked').value;
+            
+            authManager.emergency(name, severity);
+            
+            document.getElementById('emergency-form').classList.add('hidden');
+            document.getElementById('alert-sent').classList.remove('hidden');
+            
+            setTimeout(() => {
+                window.location.href = './survivor.html';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responder Operations - CAPB</title>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141b2d;
+            --bg-tertiary: #1a2237;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #00a8cc;
+            --accent-tertiary: #ff6b35;
+            --accent-warning: #ff4757;
+            --text-primary: #e6e9f0;
+            --text-secondary: #a8adb8;
+            --text-tertiary: #7a8089;
+            --border-color: rgba(0, 217, 255, 0.15);
+            --border-color-hover: rgba(0, 217, 255, 0.3);
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: rgba(10, 14, 26, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .navbar-brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-primary);
+            font-weight: 900;
+            font-size: 0.875rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 320px;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 70px);
+        }
+
+        .panel {
+            background: linear-gradient(135deg, rgba(20, 27, 45, 0.8) 0%, rgba(26, 34, 55, 0.5) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 1px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 14, 26, 0.6);
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 1px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            background: rgba(0, 217, 255, 0.06);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(0, 217, 255, 0.1);
+        }
+
+        .form-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 1px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent-primary);
+        }
+
+        .info-box {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 1px;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .info-value.secondary {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+
+        .list-item {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 0.85rem;
+            margin-bottom: 0.75rem;
+            border-radius: 1px;
+        }
+
+        .list-item:hover {
+            background: rgba(0, 217, 255, 0.06);
+            border-color: var(--border-color-hover);
+        }
+
+        .list-item-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .list-item-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        #map {
+            border-radius: 1px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 217, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-brand-icon">R</div>
+            <span>Responder Console</span>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Left Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Unit Selection</div>
+            </div>
+            <div class="panel-content">
+                <div class="form-group">
+                    <label class="form-label">Select Unit</label>
+                    <select id="unit-select" class="form-select" onchange="switchUnit()">
+                        <option value="">Choose Your Unit</option>
+                    </select>
+                </div>
+
+                <div id="unit-info" style="margin-top: 1.5rem;"></div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <div class="panel-title" style="margin-bottom: 1rem; font-size: 0.75rem;">Assignment</div>
+                    <div id="assignment-info"></div>
+                </div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button id="accept-btn" class="btn btn-success" onclick="acceptAssignment()" style="display: none;">Accept</button>
+                    <button id="complete-btn" class="btn btn-primary" onclick="completeAssignment()" style="display: none;">Delivered</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: Map -->
+        <div id="map"></div>
+
+        <!-- Right Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Navigation</div>
+            </div>
+            <div class="panel-content">
+                <div class="info-box">
+                    <div class="info-label">Current Location</div>
+                    <div class="info-value secondary" id="current-loc">-</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">Destination</div>
+                    <div class="info-value secondary" id="dest-loc">None</div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-label">ETA</div>
+                    <div class="info-value" id="eta-display">-</div>
+                </div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <div class="panel-title" style="margin-bottom: 1rem; font-size: 0.75rem;">All Patients</div>
+                    <div id="patients-list"></div>
+                </div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <div class="panel-title" style="margin-bottom: 1rem; font-size: 0.75rem;">Activity</div>
+                    <div id="activity-log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <script src="../js/store.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/statemanagement.js"></script>
+    <script src="../js/sosdb.js"></script>
+    <script src="../js/sosservice.js"></script>
+    <script src="../js/sosbridge.js"></script>
+    <script src="../js/map.js"></script>
+
+    <script>
+        requireRole('responder');
+
+        let mapService = null;
+        let myUnitId = null;
+
+        stateManager.subscribe((state) => {
+            renderUI(state);
+        });
+
+        function renderUI(state) {
+            if (!myUnitId) {
+                populateUnits(state.responders);
+                return;
+            }
+
+            const unit = state.responders.find(r => r.id === myUnitId);
+            if (unit) {
+                updateUnitInfo(unit);
+                updateAssignmentInfo(unit, state.patients);
+                updatePatientsList(state.patients);
+                updateNavigation(unit, state.patients);
+                if (mapService && mapService.isInitialized()) {
+                    updateMap(unit, state);
+                }
+            }
+        }
+
+        function populateUnits(responders) {
+            const select = document.getElementById('unit-select');
+            select.innerHTML = '<option value="">Choose Your Unit</option>';
+            responders.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = `${r.name} (${r.type})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function switchUnit() {
+            myUnitId = document.getElementById('unit-select').value;
+            if (myUnitId) {
+                renderUI(stateManager.getStateSnapshot());
+            }
+        }
+
+        function updateUnitInfo(unit) {
+            const info = document.getElementById('unit-info');
+            info.innerHTML = `
+                <div class="info-box">
+                    <div class="info-label">Unit Name</div>
+                    <div class="info-value">${unit.name}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Type</div>
+                    <div class="info-value secondary">${unit.type.toUpperCase()}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Status</div>
+                    <div class="info-value secondary">${unit.status}</div>
+                </div>
+            `;
+        }
+
+        function updateAssignmentInfo(unit, patients) {
+            const info = document.getElementById('assignment-info');
+            
+            if (unit.assignedPatientId) {
+                const patient = patients.find(p => p.id === unit.assignedPatientId);
+                if (patient) {
+                    info.innerHTML = `
+                        <div class="info-box">
+                            <div class="info-label">Patient</div>
+                            <div class="info-value">${patient.name}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Condition</div>
+                            <div class="info-value secondary">${patient.condition}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Severity</div>
+                            <div class="info-value">${patient.severity}/10</div>
+                        </div>
+                    `;
+
+                    document.getElementById('accept-btn').style.display = !unit.acceptedAssignment ? 'block' : 'none';
+                    document.getElementById('complete-btn').style.display = unit.acceptedAssignment ? 'block' : 'none';
+                    return;
+                }
+            }
+
+            info.innerHTML = '<div style="color: var(--text-tertiary); font-size: 0.85rem;">No active assignment</div>';
+            document.getElementById('accept-btn').style.display = 'none';
+            document.getElementById('complete-btn').style.display = 'none';
+        }
+
+        function updatePatientsList(patients) {
+            const list = document.getElementById('patients-list');
+            list.innerHTML = patients.map(p => `
+                <div class="list-item">
+                    <div class="list-item-title">${p.name}</div>
+                    <div class="list-item-text">${p.condition}</div>
+                    <div class="list-item-text">Severity: ${p.severity}/10</div>
+                </div>
+            `).join('');
+        }
+
+        function updateNavigation(unit, patients) {
+            document.getElementById('current-loc').textContent = 
+                `${unit.location.lat.toFixed(4)}, ${unit.location.lng.toFixed(4)}`;
+            
+            if (unit.assignedPatientId) {
+                const patient = patients.find(p => p.id === unit.assignedPatientId);
+                if (patient) {
+                    document.getElementById('dest-loc').textContent = 
+                        `${patient.location.lat.toFixed(4)}, ${patient.location.lng.toFixed(4)}`;
+                    document.getElementById('eta-display').textContent = 
+                        unit.eta ? `${unit.eta} minutes` : 'Calculating...';
+                }
+            }
+        }
+
+        function updateMap(unit, state) {
+            mapService.clearMarkers();
+
+            mapService.addMarker('my-unit',
+                [unit.location.lng, unit.location.lat],
+                { type: unit.type, title: unit.name }
+            );
+
+            state.patients.forEach(p => {
+                const severity = p.severity >= 8 ? 'critical' : 'moderate';
+                mapService.addMarker(`pat_${p.id}`,
+                    [p.location.lng, p.location.lat],
+                    { severity, title: p.name, type: 'patient' }
+                );
+            });
+
+            if (unit.assignedPatientId && unit.path) {
+                const coords = unit.path.map(p => [p.lng, p.lat]);
+                mapService.addRoute('my-route', coords, '#00d9ff');
+            }
+        }
+
+        function acceptAssignment() {
+            if (myUnitId) {
+                stateManager.acceptAssignment(myUnitId);
+                renderUI(stateManager.getStateSnapshot());
+            }
+        }
+
+        function completeAssignment() {
+            if (myUnitId) {
+                stateManager.completeAssignment(myUnitId);
+                renderUI(stateManager.getStateSnapshot());
+            }
+        }
+
+        setTimeout(() => {
+            mapService = new MapService('map');
+            mapService.init([90.4125, 23.8103], 14);
+            stateManager.startSimulation();
+        }, 500);
+
+        window.addEventListener('beforeunload', () => {
+            stateManager.stopSimulation();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Alert System - CAPB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141b2d;
+            --bg-tertiary: #1a2237;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #00a8cc;
+            --accent-tertiary: #ff6b35;
+            --accent-warning: #ff4757;
+            --text-primary: #e6e9f0;
+            --text-secondary: #a8adb8;
+            --text-tertiary: #7a8089;
+            --border-color: rgba(0, 217, 255, 0.15);
+            --border-color-hover: rgba(0, 217, 255, 0.3);
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #141b2d 25%, #0f1419 50%, #0a0e1a 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-close {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 44px;
+            height: 44px;
+            border-radius: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--accent-warning);
+            border-color: rgba(255, 71, 87, 0.4);
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(20, 27, 45, 0.85) 0%, rgba(26, 34, 55, 0.6) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 1px;
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.4);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding: 1.25rem;
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 1px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            animation: pulse 2s infinite;
+            flex-shrink: 0;
+        }
+
+        .indicator-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Inactive State */
+        .sos-inactive-state {
+            display: block;
+        }
+
+        .sos-inactive-state.hidden {
+            display: none;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 2.75rem;
+        }
+
+        .title-large {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-tertiary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: 1px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(0, 217, 255, 0.06);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(0, 217, 255, 0.1);
+        }
+
+        .severity-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .severity-option {
+            position: relative;
+        }
+
+        .severity-option input {
+            display: none;
+        }
+
+        .severity-label {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 1.1rem;
+            border-radius: 1px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .severity-option input:checked + .severity-label {
+            background: rgba(0, 217, 255, 0.15);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .severity-option.critical input:checked + .severity-label {
+            background: rgba(255, 71, 87, 0.15);
+            border-color: var(--accent-warning);
+            color: var(--accent-warning);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+        }
+
+        .severity-label:hover {
+            border-color: var(--border-color-hover);
+            background: rgba(0, 217, 255, 0.08);
+        }
+
+        .btn-sos {
+            width: 100%;
+            padding: 1.4rem;
+            background: linear-gradient(135deg, var(--accent-warning) 0%, #e84032 100%);
+            color: white;
+            border: none;
+            border-radius: 1px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(255, 71, 87, 0.2);
+        }
+
+        .btn-sos:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 71, 87, 0.4);
+        }
+
+        .btn-sos:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent-primary);
+            border-radius: 1px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 217, 255, 0.08);
+            border-color: var(--border-color-hover);
+        }
+
+        /* Active State */
+        .sos-active-state {
+            display: none;
+        }
+
+        .sos-active-state.visible {
+            display: block;
+        }
+
+        .status-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .status-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-warning);
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .status-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-block {
+            background: rgba(0, 217, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 1.75rem;
+            border-radius: 1px;
+            margin-bottom: 2rem;
+        }
+
+        .info-row {
+            margin-bottom: 1.25rem;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: 'IBM Plex Mono', monospace;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .info-value.highlight {
+            color: var(--accent-primary);
+        }
+
+        .pulse-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.75rem;
+            animation: pulse 1s infinite;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 1.1rem;
+            border: none;
+            border-radius: 1px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent-primary);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(0, 217, 255, 0.08);
+            border-color: var(--border-color-hover);
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 2rem;
+            }
+
+            .title-large {
+                font-size: 2.25rem;
+            }
+
+            .severity-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">Emergency Alert</div>
+            <button class="btn-close" onclick="handleClose()" title="Close">×</button>
+        </div>
+
+        <div class="card">
+            <!-- Inactive State -->
+            <div id="sos-inactive-state" class="sos-inactive-state">
+                <div class="status-indicator" id="user-section">
+                    <div class="indicator-dot"></div>
+                    <div class="indicator-text" id="user-status">Initializing system...</div>
+                </div>
+
+                <div class="title-section">
+                    <div class="title-large">Alert</div>
+                    <div class="subtitle">Emergency Response System</div>
+                </div>
+
+                <form id="sos-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="sos-name" class="form-input" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Severity Level</label>
+                        <div class="severity-selector">
+                            <div class="severity-option critical">
+                                <input type="radio" id="sev-critical" name="severity" value="9" checked>
+                                <label for="sev-critical" class="severity-label">Critical</label>
+                            </div>
+                            <div class="severity-option">
+                                <input type="radio" id="sev-serious" name="severity" value="6">
+                                <label for="sev-serious" class="severity-label">Serious</label>
+                            </div>
+                            <div class="severity-option">
+                                <input type="radio" id="sev-assist" name="severity" value="3">
+                                <label for="sev-assist" class="severity-label">Assistance</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <button id="send-sos-btn" class="btn-sos" onclick="sendSOS()">Send Emergency Alert</button>
+                <button class="btn-secondary" onclick="handleClose()">Cancel</button>
+            </div>
+
+            <!-- Active State -->
+            <div id="sos-active-state" class="sos-active-state">
+                <div class="status-header">
+                    <div class="status-title">Alert Active</div>
+                    <div class="status-subtitle">Services Dispatched</div>
+                </div>
+
+                <div class="info-block">
+                    <div class="info-row">
+                        <div class="info-label">Request ID</div>
+                        <div class="info-value" id="sos-id-display">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Location Status</div>
+                        <div class="info-value">
+                            <span class="pulse-indicator"></span>
+                            <span id="sos-location-display">Tracking</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Coordinates</div>
+                        <div class="info-value highlight" id="sos-coords-display">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">System Status</div>
+                        <div class="info-value highlight">Active</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-action btn-cancel" onclick="cancelSOS()">Cancel Alert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/store.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/statemanagement.js"></script>
+    <script src="../js/sosdb.js"></script>
+    <script src="../js/sosservice.js"></script>
+    <script src="../js/sosbridge.js"></script>
+
+    <script>
+        let currentSOSId = null;
+        let isSOSActive = false;
+
+        async function initSOS() {
+            try {
+                const initialized = await sosService.init();
+                if (!initialized) throw new Error('SOS Service failed');
+                
+                sosBridge.init();
+                checkUserStatus();
+                setupEventListeners();
+                subscribeToSOSEvents();
+                
+                updateUserStatus('Ready', 'active');
+            } catch (error) {
+                console.error('[SOS] Error:', error);
+                updateUserStatus('System Error', 'error');
+            }
+        }
+
+        function checkUserStatus() {
+            try {
+                const user = authManager.getUser();
+                if (user) {
+                    updateUserStatus('User: ' + user.name, 'active');
+                } else {
+                    updateUserStatus('Guest Mode - Information Required', 'active');
+                    document.getElementById('sos-form').style.display = 'block';
+                }
+            } catch (e) {
+                updateUserStatus('Ready', 'active');
+            }
+        }
+
+        function updateUserStatus(text, state) {
+            const dot = document.querySelector('.indicator-dot');
+            const status = document.getElementById('user-status');
+            status.textContent = text;
+            
+            dot.style.background = state === 'error' ? '#ff4757' : '#00d9ff';
+        }
+
+        function setupEventListeners() {
+            document.getElementById('send-sos-btn').addEventListener('click', sendSOS);
+        }
+
+        function subscribeToSOSEvents() {
+            sosService.subscribe((event) => {
+                if (event.type === 'sos_activated') {
+                    currentSOSId = event.sosId;
+                    isSOSActive = true;
+                    showSOSActive(event.data);
+                } else if (event.type === 'location_updated') {
+                    updateLocationDisplay(event.lat, event.lng, event.accuracy);
+                } else if (event.type === 'sos_resolved') {
+                    isSOSActive = false;
+                    showSOSInactive();
+                }
+            });
+        }
+
+        async function sendSOS() {
+            try {
+                const user = authManager.getUser();
+                let name = user ? user.name : document.getElementById('sos-name').value;
+
+                if (!name || name.trim() === '') {
+                    alert('Please enter your name');
+                    return;
+                }
+
+                document.getElementById('send-sos-btn').disabled = true;
+                document.getElementById('send-sos-btn').textContent = 'Sending...';
+
+                const severity = parseInt(document.querySelector('input[name="severity"]:checked').value);
+                await sosService.activateSOS({
+                    name: name.trim(),
+                    severity: severity,
+                    condition: 'Emergency Alert'
+                });
+
+            } catch (error) {
+                alert('Failed: ' + error.message);
+                document.getElementById('send-sos-btn').disabled = false;
+                document.getElementById('send-sos-btn').textContent = 'Send Emergency Alert';
+            }
+        }
+
+        function showSOSActive(sosRecord) {
+            document.getElementById('sos-inactive-state').classList.add('hidden');
+            document.getElementById('sos-active-state').classList.add('visible');
+            document.getElementById('sos-id-display').textContent = sosRecord.id;
+            updateLocationDisplay(sosRecord.location.lat, sosRecord.location.lng, sosRecord.location.accuracy);
+        }
+
+        function showSOSInactive() {
+            document.getElementById('sos-inactive-state').classList.remove('hidden');
+            document.getElementById('sos-active-state').classList.remove('visible');
+            document.getElementById('send-sos-btn').disabled = false;
+            document.getElementById('send-sos-btn').textContent = 'Send Emergency Alert';
+            checkUserStatus();
+        }
+
+        function updateLocationDisplay(lat, lng, accuracy) {
+            document.getElementById('sos-location-display').textContent = 'Tracked';
+            document.getElementById('sos-coords-display').textContent = 
+                `${lat.toFixed(6)}, ${lng.toFixed(6)}${accuracy ? ' ±' + accuracy.toFixed(0) + 'm' : ''}`;
+        }
+
+        async function cancelSOS() {
+            if (!confirm('Cancel emergency alert?')) return;
+            
+            try {
+                await sosService.resolveSOSRecord(currentSOSId);
+                showSOSInactive();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function handleClose() {
+            if (isSOSActive) {
+                alert('Cannot close while alert is active');
+                return;
+            }
+            window.location.href = '../index.html';
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSOS);
+        } else {
+            initSOS();
+        }
+    </script>
+</body>
+</html>

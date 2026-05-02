@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Role - CAPB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <div class="navbar-brand-icon">C</div>
+                <div>CAPB</div>
+            </div>
+            <button onclick="handleLogout()" class="btn btn-danger btn-sm">Logout</button>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-subtitle">Next Step</div>
+                <h2 class="section-title">Select Your Role</h2>
+                <p class="section-description">Choose how you want to participate in emergency response</p>
+            </div>
+
+            <div class="grid grid-4" style="margin-top: 3rem;">
+                <!-- Survivor -->
+                <div class="card role-card animate-in" onclick="selectRole('survivor')" style="cursor: pointer; transition: all 0.3s ease;">
+                    <div class="feature-icon" style="width: 50px; height: 50px; font-size: 1.5rem; margin-bottom: 1rem;">S</div>
+                    <h4>Survivor</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Need help or reporting injuries</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: var(--primary);">+</span>
+                            Send SOS
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: var(--primary);">+</span>
+                            Track help
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: var(--primary);">+</span>
+                            Medical alerts
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Volunteer -->
+                <div class="card role-card animate-in" onclick="selectRole('volunteer')" style="cursor: pointer; transition: all 0.3s ease; animation-delay: 0.1s;">
+                    <div class="feature-icon" style="width: 50px; height: 50px; font-size: 1.5rem; margin-bottom: 1rem; background: rgba(59, 130, 246, 0.2); color: #3b82f6;">V</div>
+                    <h4>Volunteer</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Helping survivors and responders</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #3b82f6;">+</span>
+                            Find survivors
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #3b82f6;">+</span>
+                            Coordinate aid
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #3b82f6;">+</span>
+                            Submit reports
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Responder -->
+                <div class="card role-card animate-in" onclick="selectRole('responder')" style="cursor: pointer; transition: all 0.3s ease; animation-delay: 0.2s;">
+                    <div class="feature-icon" style="width: 50px; height: 50px; font-size: 1.5rem; margin-bottom: 1rem; background: rgba(16, 185, 129, 0.2); color: #10b981;">R</div>
+                    <h4>Responder</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Emergency response personnel</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #10b981;">+</span>
+                            Dispatch teams
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #10b981;">+</span>
+                            Route planning
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #10b981;">+</span>
+                            Real-time updates
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command -->
+                <div class="card role-card animate-in" onclick="selectRole('command')" style="cursor: pointer; transition: all 0.3s ease; animation-delay: 0.3s;">
+                    <div class="feature-icon" style="width: 50px; height: 50px; font-size: 1.5rem; margin-bottom: 1rem; background: rgba(168, 85, 247, 0.2); color: #a855f7;">C</div>
+                    <h4>Command</h4>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Coordinating operations</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #a855f7;">+</span>
+                            Oversight
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #a855f7;">+</span>
+                            Analytics
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            <span style="color: #a855f7;">+</span>
+                            Strategic planning
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="../js/store.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        function selectRole(role) {
+            authManager.selectRole(role);
+            switch(role) {
+                case 'survivor':
+                    window.location.href = './survivor.html';
+                    break;
+                case 'volunteer':
+                    window.location.href = './volunteer.html';
+                    break;
+                case 'responder':
+                    window.location.href = './responder.html';
+                    break;
+                case 'command':
+                    window.location.href = './command.html';
+                    break;
+            }
+        }
+
+        function handleLogout() {
+            authManager.logout();
+            window.location.href = './login.html';
+        }
+
+        requireAuth();
+    </script>
+</body>
+</html>
